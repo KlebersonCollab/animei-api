@@ -10,8 +10,8 @@ import (
 // Implementação da interface EntityService para a entidade Anime
 type AnimeService struct{}
 
-// Método GetAll para obter todos os animes do banco de dados
-func (as *AnimeService) GetAll() ([]interface{}, error) {
+// Método GetAll para obter todos os animes do banco de dados com paginação
+func (as *AnimeService) GetAll(page int, perPage int) ([]model.Anime, error) {
 	// Abrir conexão com o banco de dados
 	db, err := helper.OpenDatabaseConnection()
 	if err != nil {
@@ -19,8 +19,24 @@ func (as *AnimeService) GetAll() ([]interface{}, error) {
 	}
 	defer db.Close()
 
-	// Executar a consulta SQL
-	rows, err := db.Query("SELECT * FROM animes")
+	// Executar a consulta SQL para obter o total de registros na tabela animes
+	var totalAnimes int
+	err = db.QueryRow("SELECT COUNT(id) FROM animes").Scan(&totalAnimes)
+	if err != nil {
+		return nil, err
+	}
+
+	// Calcular o índice inicial e final com base na página e no número de itens por página
+	startIndex := (page - 1) * perPage
+	endIndex := startIndex + perPage
+
+	// Verificar se o índice final está além do total de registros na tabela animes
+	if endIndex > totalAnimes {
+		endIndex = totalAnimes
+	}
+
+	// Executar a consulta SQL com limite e offset para obter a lista de animes com paginação
+	rows, err := db.Query("SELECT * FROM animes LIMIT ? OFFSET ?", perPage, startIndex)
 	if err != nil {
 		return nil, err
 	}
@@ -53,13 +69,8 @@ func (as *AnimeService) GetAll() ([]interface{}, error) {
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
-	// Converter a slice de animes para uma slice de interface{}
-	animesInterface := make([]interface{}, len(animes))
-	for i, anime := range animes {
-		animesInterface[i] = anime
-	}
 
-	return animesInterface, nil
+	return animes, nil
 }
 
 // Método GetByID para obter um anime pelo ID do banco de dados
