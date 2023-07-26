@@ -12,8 +12,19 @@ import (
 
 // Função para obter todos os animes
 func GetAllAnimes(w http.ResponseWriter, r *http.Request) {
+	page := 1     // Página inicial
+	perPage := 10 // Número de itens por página
+	// Verificar se os parâmetros de paginação foram passados na query da URL
+	query := r.URL.Query()
+	if pageStr := query.Get("page"); pageStr != "" {
+		page, _ = strconv.Atoi(pageStr)
+	}
+	if perPageStr := query.Get("perPage"); perPageStr != "" {
+		perPage, _ = strconv.Atoi(perPageStr)
+	}
+
 	animeService := &service.AnimeService{}
-	animes, err := animeService.GetAll()
+	animes, err := animeService.GetAll(page, perPage)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
