@@ -16,8 +16,6 @@ func Initialize() {
 	// Inicializar o roteador
 	router := mux.NewRouter()
 
-	//Auth
-	//router.HandleFunc("/api/v1/token", controller.GenerateToken).Methods("GET")
 	// Definir as rotas da API para a tabela anime
 	// para permitir apenas com autenticação, coloca a rota sobre a função authenticate()
 	router.HandleFunc("/api/v1/animes", auth.Auth(controller.GetAllAnimes)).Methods("GET")
