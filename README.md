@@ -25,6 +25,7 @@ Este projeto é uma API simples para gerenciar informações de animes, temporad
 ### Animes
 
 - **GET** `/api/v1/animes` - Listar todos os animes
+- **GET** `/api/v1/animes?page=1&perPage=5` - Listar todos os animes de modo paginado (**Novo**)
 - **GET** `/api/v1/animes/{id}` - Obter detalhes de um anime específico
 - **POST** `/api/v1/animes` - Criar um novo anime
 - **PUT** `/api/v1/animes/{id}` - Atualizar informações de um anime existente
